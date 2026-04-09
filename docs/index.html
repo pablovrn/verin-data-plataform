@@ -85,12 +85,12 @@
     border: 1px solid #DDDBCB;
     padding: 20px;
     box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+    text-align: center;
   }
 
-  iframe {
+  .dashboard img {
     width: 100%;
-    height: 600px;
-    border: none;
+    max-width: 100%;
     border-radius: 12px;
     transition: opacity 0.2s ease;
   }
@@ -103,7 +103,7 @@
 <div class="container">
 
   <h1>Verín Aberto</h1>
-  <div class="subtitle">Datos da comarca e do concello de Verín</div>
+  <div class="subtitle">Visualización moderna dos datos</div>
 
   <!-- NAV -->
   <div class="nav">
@@ -115,19 +115,19 @@
 
   <!-- DASHBOARD -->
   <div class="dashboard">
-    <iframe id="iframe-dashboard" src="images/dashboard_poboacion.pdf"></iframe>
+    <img id="img-dashboard" src="images/dashboard_poboacion.jpg" alt="Poboación">
   </div>
 
 </div>
 
 <script>
   const links = document.querySelectorAll(".nav a");
-  const iframe = document.getElementById("iframe-dashboard");
+  const img = document.getElementById("img-dashboard");
   const titulo = document.getElementById("titulo-dashboard");
 
   const dashboards = {
     demografia: {
-      src: "images/dashboard_poboacion.pdf",
+      src: "images/dashboard_poboacion.jpg",
       titulo: "Poboación"
     }
   };
@@ -142,13 +142,12 @@
 
       const target = link.dataset.target;
 
-      // animación
-      iframe.style.opacity = 0;
-
+      // animación fade
+      img.style.opacity = 0;
       setTimeout(() => {
-        iframe.src = dashboards[target].src;
+        img.src = dashboards[target].src;
         titulo.textContent = dashboards[target].titulo;
-        iframe.style.opacity = 1;
+        img.style.opacity = 1;
       }, 150);
     });
   });
