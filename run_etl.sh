@@ -14,12 +14,9 @@ echo "Instalando librerías..."
 pip install --upgrade pip
 pip install -r requirements.txt
 
-
-if [ -f "etl/poblacion.py" ]; then
-    echo "Ejecutando ETL de población..."
-    python etl/poblacion.py
-else
-    echo "No se encontró etl/poblacion.py"
-fi
+for script in etl/*.py; do
+    echo "Ejecutando $script..."
+    python "$script"
+done
 
 echo "Proceso completado"
