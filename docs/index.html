@@ -95,6 +95,17 @@
     transition: opacity 0.2s ease;
   }
 
+  .download-link {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: #1B9AAA;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.2s ease;
+  }
 </style>
 </head>
 
@@ -118,6 +129,9 @@
     <img id="img-dashboard" src="images/dashboard_poboacion.jpg" alt="Poboación">
   </div>
 
+  <!-- DESCARGA -->
+  <a href="dashboards/dashboard_poblacion.twb" class="download-link"  id="download-link" download>Descargar Dashboard</a>
+
 </div>
 
 <script>
@@ -128,7 +142,8 @@
   const dashboards = {
     demografia: {
       src: "images/dashboard_poboacion.jpg",
-      titulo: "Poboación"
+      titulo: "Poboación",
+      descarga: "dashboards/dashboard_poblacion.twbx"
     }
   };
 
@@ -147,6 +162,7 @@
       setTimeout(() => {
         img.src = dashboards[target].src;
         titulo.textContent = dashboards[target].titulo;
+        document.getElementById("download-link").href = dashboards[target].descarga;
         img.style.opacity = 1;
       }, 150);
     });
