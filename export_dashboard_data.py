@@ -1,0 +1,206 @@
+import json
+import os
+from datetime import date, datetime
+from pathlib import Path
+
+import psycopg2
+import psycopg2.extras
+from dotenv import load_dotenv
+
+
+BASE_DIR = Path(__file__).resolve().parent
+OUTPUT_PATH = BASE_DIR / "docs" / "data" / "dashboard.json"
+
+load_dotenv(BASE_DIR / ".env", override=True)
+
+USER = os.getenv("user")
+PASSWORD = os.getenv("password")
+HOST = os.getenv("host")
+PORT = os.getenv("port")
+DBNAME = os.getenv("dbname")
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL and all([USER, PASSWORD, HOST, PORT, DBNAME]):
+    DATABASE_URL = f"postgresql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}?sslmode=require"
+
+
+def json_default(value):
+    if isinstance(value, (date, datetime)):
+        return value.isoformat()
+    return value
+
+
+def normalize_text(value):
+    replacements = str(value or "").lower()
+    for source, target in (
+        ("á", "a"),
+        ("é", "e"),
+        ("í", "i"),
+        ("ó", "o"),
+        ("ú", "u"),
+        ("ü", "u"),
+        ("ñ", "n"),
+    ):
+        replacements = replacements.replace(source, target)
+    return replacements
+
+
+def rows_to_dicts(rows):
+    return [dict(row) for row in rows]
+
+
+def get_connection():
+    if not DATABASE_URL:
+        raise RuntimeError("No se encontro configuracion de base de datos en .env.")
+    return psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
+
+
+def fetch_all(query, params=None):
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(query, params or ())
+            return rows_to_dicts(cursor.fetchall())
+
+
+def fetch_municipios():
+    return fetch_all(
+        """
+        SELECT id_municipio, nombre
+        FROM verin_dw.dim_municipio
+        ORDER BY nombre ASC
+        """
+    )
+
+
+def fetch_population(municipio_id):
+    return fetch_all(
+        """
+        SELECT id_fecha, poblacion_total, hombres, mujeres
+        FROM verin_dw.fact_poblacion
+        WHERE id_municipio = %s
+        ORDER BY id_fecha ASC
+        """,
+        (municipio_id,),
+    )
+
+
+def fetch_births(municipio_id):
+    return fetch_all(
+        """
+        SELECT id_fecha, nacimientos_total
+        FROM verin_dw.fact_nacimientos
+        WHERE id_municipio = %s
+        ORDER BY id_fecha ASC
+        """,
+        (municipio_id,),
+    )
+
+
+def fetch_deaths(municipio_id):
+    return fetch_all(
+        """
+        SELECT id_fecha, defunciones_total
+        FROM verin_dw.fact_defunciones
+        WHERE id_municipio = %s
+        ORDER BY id_fecha ASC
+        """,
+        (municipio_id,),
+    )
+
+
+def fetch_age_rows(municipio_id):
+    return fetch_all(
+        """
+        SELECT
+            f.id_fecha,
+            f.id_grupo_edad,
+            f.poblacion_total,
+            f.hombres,
+            f.mujeres,
+            d.rango
+        FROM verin_dw.fact_poblacion_edad f
+        JOIN verin_dw.dim_grupo_edad d ON d.id_grupo_edad = f.id_grupo_edad
+        WHERE f.id_municipio = %s
+        ORDER BY f.id_fecha ASC, f.id_grupo_edad ASC
+        """,
+        (municipio_id,),
+    )
+
+
+def fetch_origin_rows(municipio_id):
+    return fetch_all(
+        """
+        SELECT
+            f.id_fecha,
+            f.id_lugar_nacimiento,
+            f.poblacion_total,
+            d.nombre
+        FROM verin_dw.fact_poblacion_lugar f
+        JOIN verin_dw.dim_lugar_nacimiento d ON d.id_lugar_nacimiento = f.id_lugar_nacimiento
+        WHERE f.id_municipio = %s
+        ORDER BY f.id_fecha ASC, f.poblacion_total DESC, d.nombre ASC
+        """,
+        (municipio_id,),
+    )
+
+
+def latest_rows_by_year(rows):
+    grouped = {}
+    latest_dates = {}
+
+    for row in rows:
+        year = row["id_fecha"].year
+        row_date = row["id_fecha"]
+        latest_date = latest_dates.get(year)
+
+        if latest_date is None or row_date > latest_date:
+            latest_dates[year] = row_date
+            grouped[year] = [row]
+        elif row_date == latest_date:
+            grouped[year].append(row)
+
+    return {str(year): rows for year, rows in grouped.items()}
+
+
+def build_payload():
+    municipios = fetch_municipios()
+    default_row = next((row for row in municipios if normalize_text(row["nombre"]) == "verin"), municipios[0] if municipios else None)
+
+    payload = {
+        "generated_at": datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        "default_municipio_id": default_row["id_municipio"] if default_row else None,
+        "municipios": municipios,
+        "series": {},
+    }
+
+    for municipio in municipios:
+        municipio_id = str(municipio["id_municipio"])
+        population = fetch_population(municipio["id_municipio"])
+        births = fetch_births(municipio["id_municipio"])
+        deaths = fetch_deaths(municipio["id_municipio"])
+        age_rows = fetch_age_rows(municipio["id_municipio"])
+        origin_rows = fetch_origin_rows(municipio["id_municipio"])
+
+        payload["series"][municipio_id] = {
+            "population": population,
+            "births": births,
+            "deaths": deaths,
+            "age_by_year": latest_rows_by_year(age_rows),
+            "origin_by_year": latest_rows_by_year(origin_rows),
+        }
+
+    return payload
+
+
+def main():
+    payload = build_payload()
+    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT_PATH.write_text(
+        json.dumps(payload, ensure_ascii=True, default=json_default, separators=(",", ":")),
+        encoding="utf-8",
+    )
+    print(f"Datos exportados a {OUTPUT_PATH}")
+
+
+if __name__ == "__main__":
+    main()

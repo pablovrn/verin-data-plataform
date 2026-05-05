@@ -2,172 +2,754 @@
 <html lang="gl">
 <head>
 <meta charset="UTF-8">
-<title>Verín Aberto</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verin Aberto | Poboacion</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
+  :root {
+    color-scheme: light;
+    --bg: #f5f1e3;
+    --surface: #fffdf8;
+    --surface-strong: #ffffff;
+    --border: #ddd6c2;
+    --text: #1d1d1b;
+    --muted: #6b675d;
+    --accent: #157a6e;
+    --accent-soft: rgba(21, 122, 110, 0.14);
+    --accent-2: #3b82f6;
+    --accent-3: #d97706;
+    --accent-4: #8b5cf6;
+    --danger: #b91c1c;
+    --shadow: 0 18px 42px rgba(30, 41, 59, 0.08);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
   body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
-    background: #F5F1E3;
-    color: #050505;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
   }
 
   .container {
-    max-width: 1100px;
-    margin: auto;
-    padding: 40px 20px;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 32px 20px 48px;
   }
 
-  h1 {
-    font-size: 3rem;
-    margin-bottom: 10px;
+  .hero {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 1fr;
+    align-items: start;
+    margin-bottom: 24px;
   }
 
-  .subtitle {
-    color: #666;
-    margin-bottom: 40px;
+  .hero-copy h1 {
+    margin: 0 0 10px;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    line-height: 1;
   }
 
-  /* NAV ESTILO STRIPE */
-  .nav {
-    display: flex;
-    gap: 30px;
-    margin-bottom: 30px;
-    border-bottom: 1px solid #DDDBCB;
+  .hero-copy p {
+    margin: 0;
+    max-width: 60ch;
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.5;
   }
 
-  .nav a {
+  .panel {
+    background: var(--surface-strong);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+  }
+
+  .filters h2,
+  .chart-card h2 {
+    margin: 0 0 14px;
+    font-size: 1rem;
+  }
+
+  .filter-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .field {
+    display: grid;
+    gap: 6px;
+  }
+
+  .field.full {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  select,
+  button {
+    width: 100%;
+    min-height: 44px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font: inherit;
+  }
+
+  select {
+    padding: 0 12px;
+    background: #fff;
+    color: var(--text);
+  }
+
+  .status {
+    margin-top: 12px;
+    min-height: 20px;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  .status.error {
+    color: var(--danger);
+  }
+
+  .dashboard-shell {
+    display: grid;
+    gap: 20px;
+  }
+
+  .filters {
+    padding: 18px;
+  }
+
+  .kpi-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .kpi {
+    padding: 18px;
+  }
+
+  .kpi-label {
+    margin: 0 0 10px;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  .kpi-value {
+    margin: 0;
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+    line-height: 1;
+  }
+
+  .kpi-trend {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+
+  .charts-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .chart-card {
+    padding: 18px;
+  }
+
+  .chart-card p {
+    margin: -4px 0 14px;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  .chart-wrap {
     position: relative;
-    padding-bottom: 12px;
-    text-decoration: none;
-    color: #666;
-    font-weight: 500;
-    transition: color 0.2s ease;
+    min-height: 320px;
+    height: 320px;
   }
 
-  .nav a:hover {
-    color: #050505;
+  .chart-wrap.tall {
+    min-height: 380px;
+    height: 380px;
   }
 
-  /* línea animada */
-  .nav a::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -1px;
-    width: 0%;
-    height: 2px;
-    background: #1B9AAA;
-    transition: width 0.25s ease;
-  }
-
-  .nav a:hover::after {
-    width: 100%;
-  }
-
-  .nav a.active {
-    color: #050505;
-  }
-
-  .nav a.active::after {
-    width: 100%;
-  }
-
-  /* DASHBOARD */
-  .section-title {
-    font-size: 1.8rem;
-    margin: 25px 0 20px;
-  }
-
-  .dashboard {
-    background: white;
-    border-radius: 20px;
-    border: 1px solid #DDDBCB;
-    padding: 20px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+  .empty-state {
+    padding: 24px;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--muted);
     text-align: center;
   }
 
-  .dashboard img {
-    width: 100%;
-    max-width: 100%;
-    border-radius: 12px;
-    transition: opacity 0.2s ease;
+  .footer-note {
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 0.88rem;
   }
 
-  .download-link {
-    display: inline-block;
-    margin-top: 15px;
-    padding: 10px 20px;
-    background: #1B9AAA;
-    color: white;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: background 0.2s ease;
+  @media (max-width: 1080px) {
+    .hero,
+    .charts-grid,
+    .kpi-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .filter-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 </head>
-
 <body>
-
 <div class="container">
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>Verin Aberto</h1>
+      <p>
+        Panel interactivo de poboacion da comarca de Verin conectado a Supabase.
+        Incluye evolucion temporal, reparto por sexo, estructura por edades y lugar de nacemento.
+      </p>
+      <div id="status" class="status">
+        Cargando configuracion del dashboard...
+      </div>
+    </div>
+  </section>
 
-  <h1>Verín Aberto</h1>
-  <div class="subtitle">Visualización moderna dos datos</div>
+  <section class="dashboard-shell">
+    <section class="panel filters">
+      <h2>Filtros</h2>
+      <div class="filter-grid">
+        <div class="field">
+          <label for="municipio-select">Municipio</label>
+          <select id="municipio-select" disabled>
+            <option value="">Selecciona un municipio</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="year-select">Ano de detalle</label>
+          <select id="year-select" disabled>
+            <option value="">Selecciona un ano</option>
+          </select>
+        </div>
+      </div>
+      <div class="footer-note">
+        La evolucion temporal usa toda la serie del municipio. Los graficos de edad y lugar usan el ano seleccionado.
+      </div>
+    </section>
 
-  <!-- NAV -->
-  <div class="nav">
-    <a href="#" class="active" data-target="demografia">Poboación</a>
-  </div>
+    <section class="kpi-grid">
+      <article class="panel kpi">
+        <p class="kpi-label">Poboacion total</p>
+        <h2 class="kpi-value" id="kpi-total">--</h2>
+        <div class="kpi-trend" id="kpi-total-trend">Sin datos cargados</div>
+      </article>
+      <article class="panel kpi">
+        <p class="kpi-label">Homes</p>
+        <h2 class="kpi-value" id="kpi-hombres">--</h2>
+        <div class="kpi-trend" id="kpi-hombres-share">--</div>
+      </article>
+      <article class="panel kpi">
+        <p class="kpi-label">Mulleres</p>
+        <h2 class="kpi-value" id="kpi-mujeres">--</h2>
+        <div class="kpi-trend" id="kpi-mujeres-share">--</div>
+      </article>
+      <article class="panel kpi">
+        <p class="kpi-label">Saldo vexetativo</p>
+        <h2 class="kpi-value" id="kpi-saldo">--</h2>
+        <div class="kpi-trend" id="kpi-saldo-detail">Nacementos - Defuncions</div>
+      </article>
+    </section>
 
-  <!-- TITULO -->
-  <h2 class="section-title" id="titulo-dashboard">Poboación</h2>
+    <section class="charts-grid">
+      <article class="panel chart-card">
+        <h2>Evolucion da poboacion</h2>
+        <p>Serie anual de poboacion total, homes e mulleres.</p>
+        <div class="chart-wrap">
+          <canvas id="population-trend-chart"></canvas>
+        </div>
+      </article>
 
-  <!-- DASHBOARD -->
-  <div class="dashboard">
-    <img id="img-dashboard" src="images/dashboard_poboacion.jpg" alt="Poboación">
-  </div>
+      <article class="panel chart-card">
+        <h2>Nacementos vs defuncions</h2>
+        <p>Comparativa anual para detectar o saldo vexetativo do municipio.</p>
+        <div class="chart-wrap">
+          <canvas id="vital-chart"></canvas>
+        </div>
+      </article>
 
-  <!-- DESCARGA -->
-  <a href="dashboards/dashboard_poblacion.twb" class="download-link"  id="download-link" download>Descargar Dashboard</a>
+      <article class="panel chart-card">
+        <h2>Estrutura por idade</h2>
+        <p>Distribucion da poboacion no ano seleccionado.</p>
+        <div class="chart-wrap tall">
+          <canvas id="age-chart"></canvas>
+        </div>
+      </article>
 
+      <article class="panel chart-card">
+        <h2>Lugar de nacemento</h2>
+        <p>Composicion da poboacion por procedencia no ano seleccionado.</p>
+        <div class="chart-wrap tall">
+          <canvas id="origin-chart"></canvas>
+        </div>
+      </article>
+    </section>
+  </section>
 </div>
 
 <script>
-  const links = document.querySelectorAll(".nav a");
-  const img = document.getElementById("img-dashboard");
-  const titulo = document.getElementById("titulo-dashboard");
+  const DATA_URL = "./data/dashboard.json";
 
-  const dashboards = {
-    demografia: {
-      src: "images/dashboard_poboacion.jpg",
-      titulo: "Poboación",
-      descarga: "dashboards/dashboard_poblacion.twbx"
+  const state = {
+    dataset: null,
+    municipios: [],
+    years: [],
+    selectedMunicipio: "",
+    selectedYear: "",
+    charts: {
+      population: null,
+      vital: null,
+      age: null,
+      origin: null
+    },
+    series: {
+      population: [],
+      births: [],
+      deaths: [],
+      age: [],
+      origin: []
     }
   };
 
-  links.forEach(link => {
-    link.addEventListener("click", e => {
-      e.preventDefault();
+  const elements = {
+    status: document.getElementById("status"),
+    municipioSelect: document.getElementById("municipio-select"),
+    yearSelect: document.getElementById("year-select"),
+    kpiTotal: document.getElementById("kpi-total"),
+    kpiTotalTrend: document.getElementById("kpi-total-trend"),
+    kpiHombres: document.getElementById("kpi-hombres"),
+    kpiHombresShare: document.getElementById("kpi-hombres-share"),
+    kpiMujeres: document.getElementById("kpi-mujeres"),
+    kpiMujeresShare: document.getElementById("kpi-mujeres-share"),
+    kpiSaldo: document.getElementById("kpi-saldo"),
+    kpiSaldoDetail: document.getElementById("kpi-saldo-detail")
+  };
 
-      // activo
-      links.forEach(l => l.classList.remove("active"));
-      link.classList.add("active");
+  const chartDefaults = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          usePointStyle: true,
+          boxWidth: 10
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: "#5f5a4f" },
+        grid: { display: false }
+      },
+      y: {
+        ticks: { color: "#5f5a4f" },
+        grid: { color: "rgba(148, 163, 184, 0.22)" }
+      }
+    }
+  };
 
-      const target = link.dataset.target;
+  function setStatus(message, type = "") {
+    elements.status.textContent = message;
+    elements.status.className = type ? `status ${type}` : "status";
+  }
 
-      // animación fade
-      img.style.opacity = 0;
-      setTimeout(() => {
-        img.src = dashboards[target].src;
-        titulo.textContent = dashboards[target].titulo;
-        document.getElementById("download-link").href = dashboards[target].descarga;
-        img.style.opacity = 1;
-      }, 150);
+  function formatNumber(value) {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) {
+      return "--";
+    }
+
+    return new Intl.NumberFormat("gl-ES").format(value);
+  }
+
+  function formatPercent(value) {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) {
+      return "--";
+    }
+
+    return new Intl.NumberFormat("gl-ES", {
+      style: "percent",
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1
+    }).format(value);
+  }
+
+  function getYearFromDate(dateString) {
+    return Number(String(dateString).slice(0, 4));
+  }
+
+  function normalizeText(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+  }
+
+  function sortRowsByDate(rows) {
+    return [...rows].sort((a, b) => new Date(a.id_fecha) - new Date(b.id_fecha));
+  }
+
+  function dedupeYears(rows) {
+    return [...new Set(rows.map(row => getYearFromDate(row.id_fecha)))].sort((a, b) => a - b);
+  }
+
+  function resetKPIs() {
+    elements.kpiTotal.textContent = "--";
+    elements.kpiTotalTrend.textContent = "Sin datos cargados";
+    elements.kpiHombres.textContent = "--";
+    elements.kpiHombresShare.textContent = "--";
+    elements.kpiMujeres.textContent = "--";
+    elements.kpiMujeresShare.textContent = "--";
+    elements.kpiSaldo.textContent = "--";
+    elements.kpiSaldoDetail.textContent = "Nacementos - Defuncions";
+  }
+
+  function destroyCharts() {
+    Object.values(state.charts).forEach(chart => {
+      if (chart) {
+        chart.destroy();
+      }
     });
-  });
-</script>
+    state.charts = {
+      population: null,
+      vital: null,
+      age: null,
+      origin: null
+    };
+  }
 
+  function createChart(canvasId, config) {
+    const canvas = document.getElementById(canvasId);
+    const existing = Chart.getChart(canvas);
+    if (existing) {
+      existing.destroy();
+    }
+    return new Chart(canvas, config);
+  }
+
+  async function fetchJson(url) {
+    const response = await fetch(url);
+    let payload = null;
+
+    try {
+      payload = await response.json();
+    } catch (error) {
+      throw new Error("No se pudo leer el archivo de datos del dashboard.");
+    }
+
+    if (!response.ok) {
+      throw new Error(payload.error || "No se pudo completar la solicitud.");
+    }
+
+    return payload;
+  }
+
+  function getMunicipioSeries(municipioId) {
+    return state.dataset?.series?.[String(municipioId)] || null;
+  }
+
+  function fillMunicipioSelect(municipios) {
+    elements.municipioSelect.innerHTML = municipios
+      .map(municipio => `<option value="${municipio.id_municipio}">${municipio.nombre}</option>`)
+      .join("");
+    elements.municipioSelect.disabled = false;
+  }
+
+  function fillYearSelect(years) {
+    elements.yearSelect.innerHTML = years
+      .map(year => `<option value="${year}">${year}</option>`)
+      .join("");
+    elements.yearSelect.disabled = false;
+  }
+
+  function mergeVitalSeries(years, births, deaths) {
+    return years.map(year => ({
+      year,
+      births: births.find(item => getYearFromDate(item.id_fecha) === year)?.nacimientos_total || 0,
+      deaths: deaths.find(item => getYearFromDate(item.id_fecha) === year)?.defunciones_total || 0
+    }));
+  }
+
+  function updateKPIs(populationRows, birthsRows, deathsRows, selectedYear) {
+    const currentRow = [...populationRows].reverse().find(row => getYearFromDate(row.id_fecha) === Number(selectedYear));
+    const previousRow = [...populationRows].reverse().find(row => getYearFromDate(row.id_fecha) < Number(selectedYear));
+    const births = birthsRows.find(row => getYearFromDate(row.id_fecha) === Number(selectedYear))?.nacimientos_total || 0;
+    const deaths = deathsRows.find(row => getYearFromDate(row.id_fecha) === Number(selectedYear))?.defunciones_total || 0;
+
+    if (!currentRow) {
+      resetKPIs();
+      elements.kpiTotalTrend.textContent = "No hay registro de poblacion para el ano seleccionado";
+      return;
+    }
+
+    const total = currentRow.poblacion_total || 0;
+    const hombres = currentRow.hombres || 0;
+    const mujeres = currentRow.mujeres || 0;
+    const variation = previousRow ? total - (previousRow.poblacion_total || 0) : null;
+
+    elements.kpiTotal.textContent = formatNumber(total);
+    elements.kpiTotalTrend.textContent = variation === null
+      ? "Primer ano disponible en la serie"
+      : `${variation >= 0 ? "+" : ""}${formatNumber(variation)} vs ${getYearFromDate(previousRow.id_fecha)}`;
+    elements.kpiHombres.textContent = formatNumber(hombres);
+    elements.kpiHombresShare.textContent = `${formatPercent(total ? hombres / total : 0)} do total`;
+    elements.kpiMujeres.textContent = formatNumber(mujeres);
+    elements.kpiMujeresShare.textContent = `${formatPercent(total ? mujeres / total : 0)} do total`;
+    elements.kpiSaldo.textContent = `${births - deaths >= 0 ? "+" : ""}${formatNumber(births - deaths)}`;
+    elements.kpiSaldoDetail.textContent = `${formatNumber(births)} nacementos e ${formatNumber(deaths)} defuncions`;
+  }
+
+  function renderPopulationChart(rows) {
+    state.charts.population = createChart("population-trend-chart", {
+      type: "line",
+      data: {
+        labels: rows.map(row => getYearFromDate(row.id_fecha)),
+        datasets: [
+          {
+            label: "Poboacion total",
+            data: rows.map(row => row.poblacion_total),
+            borderColor: "#157a6e",
+            backgroundColor: "rgba(21, 122, 110, 0.12)",
+            tension: 0.3,
+            fill: true,
+            pointRadius: 3
+          },
+          {
+            label: "Homes",
+            data: rows.map(row => row.hombres),
+            borderColor: "#3b82f6",
+            backgroundColor: "#3b82f6",
+            tension: 0.3,
+            pointRadius: 2
+          },
+          {
+            label: "Mulleres",
+            data: rows.map(row => row.mujeres),
+            borderColor: "#d97706",
+            backgroundColor: "#d97706",
+            tension: 0.3,
+            pointRadius: 2
+          }
+        ]
+      },
+      options: chartDefaults
+    });
+  }
+
+  function renderVitalChart(rows) {
+    state.charts.vital = createChart("vital-chart", {
+      type: "bar",
+      data: {
+        labels: rows.map(row => row.year),
+        datasets: [
+          {
+            label: "Nacementos",
+            data: rows.map(row => row.births),
+            backgroundColor: "rgba(59, 130, 246, 0.8)",
+            borderRadius: 6
+          },
+          {
+            label: "Defuncions",
+            data: rows.map(row => row.deaths),
+            backgroundColor: "rgba(217, 119, 6, 0.8)",
+            borderRadius: 6
+          }
+        ]
+      },
+      options: chartDefaults
+    });
+  }
+
+  function renderAgeChart(rows) {
+    state.charts.age = createChart("age-chart", {
+      type: "bar",
+      data: {
+        labels: rows.map(row => row.dim_grupo_edad?.rango || `Grupo ${row.id_grupo_edad}`),
+        datasets: [
+          {
+            label: "Homes",
+            data: rows.map(row => row.hombres || 0),
+            backgroundColor: "rgba(59, 130, 246, 0.8)",
+            borderRadius: 6
+          },
+          {
+            label: "Mulleres",
+            data: rows.map(row => row.mujeres || 0),
+            backgroundColor: "rgba(139, 92, 246, 0.8)",
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        ...chartDefaults,
+        indexAxis: "y",
+        scales: {
+          x: chartDefaults.scales.y,
+          y: chartDefaults.scales.x
+        }
+      }
+    });
+  }
+
+  function renderOriginChart(rows) {
+    state.charts.origin = createChart("origin-chart", {
+      type: "doughnut",
+      data: {
+        labels: rows.map(row => row.dim_lugar_nacimiento?.nombre || `Lugar ${row.id_lugar_nacimiento}`),
+        datasets: [
+          {
+            data: rows.map(row => row.poblacion_total || 0),
+            backgroundColor: [
+              "#157a6e",
+              "#3b82f6",
+              "#d97706",
+              "#8b5cf6",
+              "#ef4444",
+              "#0f766e",
+              "#eab308",
+              "#6b7280"
+            ],
+            borderWidth: 0
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              usePointStyle: true,
+              boxWidth: 10
+            }
+          }
+        }
+      }
+    });
+  }
+
+  async function loadMunicipioDashboard(municipioId, preferredYear) {
+    setStatus("Cargando series y actualizando graficos...");
+
+    try {
+      const municipioSeries = getMunicipioSeries(municipioId);
+
+      if (!municipioSeries) {
+        throw new Error("No hay datos exportados para ese municipio.");
+      }
+
+      const populationRows = sortRowsByDate(municipioSeries.population || []);
+      const birthsRows = sortRowsByDate(municipioSeries.births || []);
+      const deathsRows = sortRowsByDate(municipioSeries.deaths || []);
+
+      if (!populationRows.length) {
+        throw new Error("Ese municipio no tiene registros en fact_poblacion.");
+      }
+
+      const years = dedupeYears(populationRows);
+      const selectedYear = preferredYear && years.includes(Number(preferredYear))
+        ? Number(preferredYear)
+        : years[years.length - 1];
+      const ageRows = municipioSeries.age_by_year?.[String(selectedYear)] || [];
+      const originRows = municipioSeries.origin_by_year?.[String(selectedYear)] || [];
+
+      state.series.population = populationRows;
+      state.series.births = birthsRows;
+      state.series.deaths = deathsRows;
+      state.years = years;
+      state.selectedMunicipio = String(municipioId);
+      state.selectedYear = String(selectedYear);
+
+      fillYearSelect(years);
+      elements.yearSelect.value = String(selectedYear);
+
+      state.series.age = ageRows;
+      state.series.origin = originRows;
+
+      destroyCharts();
+      renderPopulationChart(populationRows);
+      renderVitalChart(mergeVitalSeries(years, birthsRows, deathsRows));
+      renderAgeChart(ageRows);
+      renderOriginChart(originRows);
+      updateKPIs(populationRows, birthsRows, deathsRows, selectedYear);
+
+      const municipioNombre = state.municipios.find(item => String(item.id_municipio) === String(municipioId))?.nombre || "Municipio";
+      const generatedAt = state.dataset?.generated_at ? ` Datos exportados: ${state.dataset.generated_at}.` : "";
+      setStatus(`Datos cargados para ${municipioNombre} (${selectedYear}).${generatedAt}`);
+    } catch (error) {
+      destroyCharts();
+      resetKPIs();
+      setStatus(error.message, "error");
+    }
+  }
+
+  async function connectAndBootstrap() {
+    setStatus("Cargando datos estaticos del dashboard...");
+
+    try {
+      const payload = await fetchJson(DATA_URL);
+      const municipios = payload.municipios || [];
+
+      if (!municipios.length) {
+        throw new Error("No se encontraron municipios en el archivo de datos.");
+      }
+
+      state.dataset = payload;
+      state.municipios = municipios;
+      fillMunicipioSelect(municipios);
+
+      const defaultMunicipio = String(
+        payload.default_municipio_id
+          || municipios.find(item => normalizeText(item.nombre) === "verin")?.id_municipio
+          || municipios[0].id_municipio
+      );
+      elements.municipioSelect.value = defaultMunicipio;
+      await loadMunicipioDashboard(defaultMunicipio);
+    } catch (error) {
+      setStatus(error.message, "error");
+    }
+  }
+
+  elements.municipioSelect.addEventListener("change", async event => {
+    if (!event.target.value) {
+      return;
+    }
+    await loadMunicipioDashboard(event.target.value, elements.yearSelect.value);
+  });
+
+  elements.yearSelect.addEventListener("change", async event => {
+    if (!event.target.value || !elements.municipioSelect.value) {
+      return;
+    }
+    await loadMunicipioDashboard(elements.municipioSelect.value, event.target.value);
+  });
+
+  resetKPIs();
+  connectAndBootstrap();
+</script>
 </body>
 </html>
