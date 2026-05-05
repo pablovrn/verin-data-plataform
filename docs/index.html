@@ -587,7 +587,7 @@
     state.charts.age = createChart("age-chart", {
       type: "bar",
       data: {
-        labels: rows.map(row => row.dim_grupo_edad?.rango || `Grupo ${row.id_grupo_edad}`),
+        labels: rows.map(row => row.rango || `Grupo ${row.id_grupo_edad}`),
         datasets: [
           {
             label: "Homes",
@@ -618,7 +618,7 @@
     state.charts.origin = createChart("origin-chart", {
       type: "doughnut",
       data: {
-        labels: rows.map(row => row.dim_lugar_nacimiento?.nombre || `Lugar ${row.id_lugar_nacimiento}`),
+        labels: rows.map(row => row.nombre || `Lugar ${row.id_lugar_nacimiento}`),
         datasets: [
           {
             data: rows.map(row => row.poblacion_total || 0),
