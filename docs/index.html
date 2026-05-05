@@ -8,19 +8,20 @@
 <style>
   :root {
     color-scheme: light;
-    --bg: #f5f1e3;
-    --surface: #fffdf8;
+    --bg: #f3f4f8;
+    --surface: #fbfaf6;
     --surface-strong: #ffffff;
-    --border: #ddd6c2;
-    --text: #1d1d1b;
-    --muted: #6b675d;
+    --border: #d9deea;
+    --text: #172033;
+    --muted: #5f6b85;
     --accent: #157a6e;
     --accent-soft: rgba(21, 122, 110, 0.14);
     --accent-2: #3b82f6;
     --accent-3: #d97706;
     --accent-4: #8b5cf6;
     --danger: #b91c1c;
-    --shadow: 0 18px 42px rgba(30, 41, 59, 0.08);
+    --ink-soft: #eef2fb;
+    --shadow: 0 20px 50px rgba(23, 32, 51, 0.08);
   }
 
   * {
@@ -30,49 +31,74 @@
   body {
     margin: 0;
     font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: var(--bg);
+    background:
+      radial-gradient(circle at top left, rgba(59, 130, 246, 0.08), transparent 28%),
+      radial-gradient(circle at top right, rgba(217, 119, 6, 0.08), transparent 24%),
+      linear-gradient(180deg, #f8f9fc 0%, var(--bg) 100%);
     color: var(--text);
   }
 
   .container {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 32px 20px 48px;
+    padding: 40px 20px 56px;
   }
 
   .hero {
     display: grid;
-    gap: 16px;
+    gap: 18px;
     grid-template-columns: 1fr;
     align-items: start;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
+  }
+
+  .hero-copy {
+    padding: 28px 30px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 255, 0.88));
+    border: 1px solid rgba(217, 222, 234, 0.95);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgba(21, 122, 110, 0.1);
+    color: var(--accent);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0;
   }
 
   .hero-copy h1 {
     margin: 0 0 10px;
     font-size: clamp(2rem, 4vw, 3.4rem);
-    line-height: 1;
+    line-height: 0.98;
   }
 
   .hero-copy p {
     margin: 0;
-    max-width: 60ch;
+    max-width: 66ch;
     color: var(--muted);
-    font-size: 1rem;
-    line-height: 1.5;
+    font-size: 1.02rem;
+    line-height: 1.65;
   }
 
   .panel {
     background: var(--surface-strong);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 18px;
     box-shadow: var(--shadow);
   }
 
   .filters h2,
   .chart-card h2 {
     margin: 0 0 14px;
-    font-size: 1rem;
+    font-size: 1.05rem;
   }
 
   .filter-grid {
@@ -91,8 +117,10 @@
   }
 
   label {
-    font-size: 0.9rem;
+    font-size: 0.84rem;
     font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
   }
 
   select,
@@ -105,16 +133,19 @@
   }
 
   select {
-    padding: 0 12px;
-    background: #fff;
+    padding: 0 14px;
+    background: #f9fbff;
     color: var(--text);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
   }
 
   .status {
-    margin-top: 12px;
+    margin-top: 16px;
     min-height: 20px;
     color: var(--muted);
     font-size: 0.92rem;
+    padding-top: 14px;
+    border-top: 1px solid rgba(217, 222, 234, 0.8);
   }
 
   .status.error {
@@ -123,66 +154,86 @@
 
   .dashboard-shell {
     display: grid;
-    gap: 20px;
+    gap: 22px;
   }
 
   .filters {
-    padding: 18px;
+    padding: 22px 24px;
+    background: linear-gradient(180deg, rgba(251, 250, 246, 0.9), rgba(255, 255, 255, 0.98));
   }
 
   .kpi-grid {
     display: grid;
-    gap: 16px;
+    gap: 18px;
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .kpi {
-    padding: 18px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(248, 250, 255, 0.98));
+  }
+
+  .kpi::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
   }
 
   .kpi-label {
     margin: 0 0 10px;
     color: var(--muted);
-    font-size: 0.92rem;
+    font-size: 0.88rem;
+    text-transform: uppercase;
   }
 
   .kpi-value {
     margin: 0;
     font-size: clamp(1.7rem, 3vw, 2.4rem);
-    line-height: 1;
+    line-height: 1.05;
   }
 
   .kpi-trend {
-    margin-top: 8px;
+    margin-top: 10px;
     color: var(--muted);
     font-size: 0.88rem;
+    line-height: 1.45;
   }
 
   .charts-grid {
     display: grid;
-    gap: 20px;
+    gap: 22px;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .chart-card {
-    padding: 18px;
+    padding: 22px 22px 18px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(248, 250, 255, 0.96));
   }
 
   .chart-card p {
-    margin: -4px 0 14px;
+    margin: -2px 0 18px;
     color: var(--muted);
     font-size: 0.92rem;
+    line-height: 1.5;
   }
 
   .chart-wrap {
     position: relative;
-    min-height: 320px;
-    height: 320px;
+    min-height: 340px;
+    height: 340px;
+    padding: 6px 4px 0;
   }
 
   .chart-wrap.tall {
-    min-height: 380px;
-    height: 380px;
+    min-height: 500px;
+    height: 500px;
   }
 
   .empty-state {
@@ -195,13 +246,13 @@
   }
 
   .footer-note {
-    margin-top: 4px;
+    margin-top: 12px;
     color: var(--muted);
     font-size: 0.88rem;
+    line-height: 1.5;
   }
 
   @media (max-width: 1080px) {
-    .hero,
     .charts-grid,
     .kpi-grid {
       grid-template-columns: 1fr;
@@ -209,8 +260,26 @@
   }
 
   @media (max-width: 720px) {
+    .container {
+      padding: 24px 16px 40px;
+    }
+
+    .hero-copy,
+    .filters,
+    .chart-card,
+    .kpi {
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+
     .filter-grid {
       grid-template-columns: 1fr;
+    }
+
+    .chart-wrap,
+    .chart-wrap.tall {
+      min-height: 360px;
+      height: 360px;
     }
   }
 </style>
@@ -219,10 +288,11 @@
 <div class="container">
   <section class="hero">
     <div class="hero-copy">
+      <div class="eyebrow">Comarca de Verin · Dashboard demografico</div>
       <h1>Verin Aberto</h1>
       <p>
-        Panel interactivo de poboacion da comarca de Verin conectado a Supabase.
-        Incluye evolucion temporal, reparto por sexo, estructura por edades y lugar de nacemento.
+        Un panel visual para explorar la evolucion demografica de la comarca: poblacion,
+        saldo vexetativo, estructura por edades y origen de la poblacion en una sola vista.
       </p>
       <div id="status" class="status">
         Cargando configuracion del dashboard...
@@ -352,22 +422,46 @@
   const chartDefaults = {
     responsive: true,
     maintainAspectRatio: false,
+    interaction: {
+      mode: "index",
+      intersect: false
+    },
+    layout: {
+      padding: {
+        top: 8,
+        right: 10,
+        bottom: 6,
+        left: 6
+      }
+    },
     plugins: {
       legend: {
         labels: {
           usePointStyle: true,
-          boxWidth: 10
+          boxWidth: 10,
+          color: "#51607a",
+          padding: 16
         }
+      },
+      tooltip: {
+        backgroundColor: "rgba(23, 32, 51, 0.94)",
+        titleColor: "#ffffff",
+        bodyColor: "#eaf0ff",
+        padding: 12,
+        cornerRadius: 10,
+        displayColors: true
       }
     },
     scales: {
       x: {
-        ticks: { color: "#5f5a4f" },
-        grid: { display: false }
+        ticks: { color: "#5f6b85", padding: 8 },
+        grid: { display: false, drawBorder: false },
+        border: { display: false }
       },
       y: {
-        ticks: { color: "#5f5a4f" },
-        grid: { color: "rgba(148, 163, 184, 0.22)" }
+        ticks: { color: "#5f6b85", padding: 10 },
+        grid: { color: "rgba(148, 163, 184, 0.18)", drawBorder: false },
+        border: { display: false }
       }
     }
   };
@@ -593,22 +687,49 @@
             label: "Homes",
             data: rows.map(row => row.hombres || 0),
             backgroundColor: "rgba(59, 130, 246, 0.8)",
-            borderRadius: 6
+            borderRadius: 6,
+            borderSkipped: false,
+            categoryPercentage: 0.72,
+            barPercentage: 0.92,
+            clip: false
           },
           {
             label: "Mulleres",
             data: rows.map(row => row.mujeres || 0),
             backgroundColor: "rgba(139, 92, 246, 0.8)",
-            borderRadius: 6
+            borderRadius: 6,
+            borderSkipped: false,
+            categoryPercentage: 0.72,
+            barPercentage: 0.92,
+            clip: false
           }
         ]
       },
       options: {
         ...chartDefaults,
         indexAxis: "y",
+        layout: {
+          padding: {
+            top: 18,
+            right: 18,
+            bottom: 18,
+            left: 8
+          }
+        },
         scales: {
-          x: chartDefaults.scales.y,
-          y: chartDefaults.scales.x
+          x: {
+            ...chartDefaults.scales.y,
+            grace: "10%"
+          },
+          y: {
+            ...chartDefaults.scales.x,
+            offset: true,
+            ticks: {
+              color: "#5f6b85",
+              padding: 10,
+              autoSkip: false
+            }
+          }
         }
       }
     });
@@ -639,13 +760,30 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+          padding: {
+            top: 8,
+            right: 8,
+            bottom: 8,
+            left: 8
+          }
+        },
         plugins: {
           legend: {
             position: "bottom",
             labels: {
               usePointStyle: true,
-              boxWidth: 10
+              boxWidth: 10,
+              color: "#51607a",
+              padding: 14
             }
+          },
+          tooltip: {
+            backgroundColor: "rgba(23, 32, 51, 0.94)",
+            titleColor: "#ffffff",
+            bodyColor: "#eaf0ff",
+            padding: 12,
+            cornerRadius: 10
           }
         }
       }
