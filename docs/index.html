@@ -396,7 +396,7 @@
         </div>
       </div>
       <div class="footer-note">
-        A evolucion temporal usa toda a serie do municipio. Os graficos de idade e procedencia usan o ano seleccionado.
+        A evolucion temporal usa toda a serie do municipio. Os graficos de idade e procedencia usan o ano seleccionado. So existen datos de idade e procedencia para 2001, 2011 e dende 2021 en diante.
       </div>
     </section>
 
@@ -602,6 +602,14 @@
     }).format(value);
   }
 
+  function formatPercentNumber(value, fractionDigits = 1) {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) {
+      return "--";
+    }
+
+    return `${formatDecimal(value, fractionDigits)}%`;
+  }
+
   function getYearFromDate(dateString) {
     return Number(String(dateString).slice(0, 4));
   }
@@ -670,6 +678,21 @@
           ...totals
         };
       });
+  }
+
+  function buildAgeTrendPercentages(rows) {
+    return (rows || []).map(row => {
+      const total = AGE_BUCKETS.reduce((sum, bucket) => sum + Number(row[bucket.key] || 0), 0);
+      const percentages = AGE_BUCKETS.reduce((accumulator, bucket) => {
+        accumulator[bucket.key] = total ? (Number(row[bucket.key] || 0) / total) * 100 : 0;
+        return accumulator;
+      }, {});
+
+      return {
+        year: row.year,
+        ...percentages
+      };
+    });
   }
 
   function getAgingIndex(rows) {
@@ -833,6 +856,14 @@
     elements.yearSelect.disabled = false;
   }
 
+  function getAvailableYears(populationRows, municipioSeries) {
+    const populationYears = dedupeYears(populationRows || []);
+    const ageYears = Object.keys(municipioSeries?.age_by_year || {}).map(Number);
+    const originYears = Object.keys(municipioSeries?.origin_by_year || {}).map(Number);
+
+    return [...new Set([...populationYears, ...ageYears, ...originYears])].sort((a, b) => a - b);
+  }
+
   function mergeVitalSeries(years, births, deaths) {
     return years.map(year => ({
       year,
@@ -844,33 +875,46 @@
   function updateKPIs(populationRows, birthsRows, deathsRows, ageRows, selectedYear) {
     const currentRow = [...populationRows].reverse().find(row => getYearFromDate(row.id_fecha) === Number(selectedYear));
     const previousRow = [...populationRows].reverse().find(row => getYearFromDate(row.id_fecha) < Number(selectedYear));
-    const births = birthsRows.find(row => getYearFromDate(row.id_fecha) === Number(selectedYear))?.nacimientos_total || 0;
-    const deaths = deathsRows.find(row => getYearFromDate(row.id_fecha) === Number(selectedYear))?.defunciones_total || 0;
-
-    if (!currentRow) {
-      resetKPIs();
-      elements.kpiTotalTrend.textContent = "Non hai rexistro de poboacion para o ano seleccionado";
-      return;
-    }
-
-    const total = currentRow.poblacion_total || 0;
-    const hombres = currentRow.hombres || 0;
-    const mujeres = currentRow.mujeres || 0;
-    const variation = previousRow ? total - (previousRow.poblacion_total || 0) : null;
+    const birthsRow = birthsRows.find(row => getYearFromDate(row.id_fecha) === Number(selectedYear));
+    const deathsRow = deathsRows.find(row => getYearFromDate(row.id_fecha) === Number(selectedYear));
+    const births = birthsRow?.nacimientos_total;
+    const deaths = deathsRow?.defunciones_total;
     const agingIndex = getAgingIndex(ageRows);
 
-    elements.kpiTotal.textContent = formatNumber(total);
-    elements.kpiTotalTrend.textContent = variation === null
-      ? "Primeiro ano dispoñible na serie"
-      : `${variation >= 0 ? "+" : ""}${formatNumber(variation)} vs ${getYearFromDate(previousRow.id_fecha)}`;
-    elements.kpiHombres.textContent = formatNumber(hombres);
-    elements.kpiHombresShare.textContent = `${formatPercent(total ? hombres / total : 0)} do total`;
-    elements.kpiMujeres.textContent = formatNumber(mujeres);
-    elements.kpiMujeresShare.textContent = `${formatPercent(total ? mujeres / total : 0)} do total`;
+    if (currentRow) {
+      const total = currentRow.poblacion_total || 0;
+      const hombres = currentRow.hombres || 0;
+      const mujeres = currentRow.mujeres || 0;
+      const variation = previousRow ? total - (previousRow.poblacion_total || 0) : null;
+
+      elements.kpiTotal.textContent = formatNumber(total);
+      elements.kpiTotalTrend.textContent = variation === null
+        ? "Primeiro ano dispoñible na serie"
+        : `${variation >= 0 ? "+" : ""}${formatNumber(variation)} vs ${getYearFromDate(previousRow.id_fecha)}`;
+      elements.kpiHombres.textContent = formatNumber(hombres);
+      elements.kpiHombresShare.textContent = `${formatPercent(total ? hombres / total : 0)} do total`;
+      elements.kpiMujeres.textContent = formatNumber(mujeres);
+      elements.kpiMujeresShare.textContent = `${formatPercent(total ? mujeres / total : 0)} do total`;
+    } else {
+      elements.kpiTotal.textContent = "--";
+      elements.kpiTotalTrend.textContent = "Non hai rexistro de poboacion para o ano seleccionado";
+      elements.kpiHombres.textContent = "--";
+      elements.kpiHombresShare.textContent = "--";
+      elements.kpiMujeres.textContent = "--";
+      elements.kpiMujeresShare.textContent = "--";
+    }
+
     elements.kpiAging.textContent = agingIndex === null ? "--" : formatDecimal(agingIndex);
     elements.kpiAgingDetail.textContent = getAgingDetail(ageRows);
-    elements.kpiSaldo.textContent = `${births - deaths >= 0 ? "+" : ""}${formatNumber(births - deaths)}`;
-    elements.kpiSaldoDetail.textContent = `${formatNumber(births)} nacementos e ${formatNumber(deaths)} defuncions`;
+
+    if (birthsRow || deathsRow) {
+      const balance = Number(births || 0) - Number(deaths || 0);
+      elements.kpiSaldo.textContent = `${balance >= 0 ? "+" : ""}${formatNumber(balance)}`;
+      elements.kpiSaldoDetail.textContent = `${formatNumber(births || 0)} nacementos e ${formatNumber(deaths || 0)} defuncions`;
+    } else {
+      elements.kpiSaldo.textContent = "--";
+      elements.kpiSaldoDetail.textContent = "Sen rexistro de nacementos e defuncions para ese ano";
+    }
   }
 
   function renderPopulationChart(rows) {
@@ -935,13 +979,15 @@
   }
 
   function renderAgeTrendChart(rows) {
+    const percentageRows = buildAgeTrendPercentages(rows);
+
     state.charts.ageTrend = createChart("age-trend-chart", {
       type: "line",
       data: {
-        labels: rows.map(row => row.year),
+        labels: percentageRows.map(row => row.year),
         datasets: AGE_BUCKETS.map(bucket => ({
           label: bucket.label,
-          data: rows.map(row => row[bucket.key] || 0),
+          data: percentageRows.map(row => row[bucket.key] || 0),
           borderColor: bucket.color,
           backgroundColor: bucket.color,
           tension: 0.28,
@@ -950,7 +996,35 @@
           pointHoverRadius: 4
         }))
       },
-      options: chartDefaults
+      options: {
+        ...chartDefaults,
+        plugins: {
+          ...chartDefaults.plugins,
+          tooltip: {
+            ...chartDefaults.plugins.tooltip,
+            callbacks: {
+              label(context) {
+                return `${context.dataset.label}: ${formatPercentNumber(context.parsed.y)}`;
+              }
+            }
+          }
+        },
+        scales: {
+          ...chartDefaults.scales,
+          y: {
+            ...chartDefaults.scales.y,
+            min: 0,
+            max: 100,
+            ticks: {
+              color: "#5f7891",
+              padding: 10,
+              callback(value) {
+                return `${value}%`;
+              }
+            }
+          }
+        }
+      }
     });
   }
 
@@ -1013,6 +1087,8 @@
   }
 
   function renderOriginChart(rows) {
+    const total = rows.reduce((sum, row) => sum + Number(row.poblacion_total || 0), 0);
+
     state.charts.origin = createChart("origin-chart", {
       type: "doughnut",
       data: {
@@ -1052,7 +1128,14 @@
             titleColor: "#ffffff",
             bodyColor: "#eff7ff",
             padding: 12,
-            cornerRadius: 10
+            cornerRadius: 10,
+            callbacks: {
+              label(context) {
+                const value = Number(context.parsed || 0);
+                const share = total ? (value / total) * 100 : 0;
+                return `${context.label}: ${formatNumber(value)} persoas · ${formatPercentNumber(share)}`;
+              }
+            }
           }
         }
       }
@@ -1078,7 +1161,7 @@
         throw new Error("Ese municipio non ten rexistros en fact_poblacion.");
       }
 
-      const years = dedupeYears(populationRows);
+      const years = getAvailableYears(populationRows, municipioSeries);
       const selectedYear = preferredYear && years.includes(Number(preferredYear))
         ? Number(preferredYear)
         : years[years.length - 1];
