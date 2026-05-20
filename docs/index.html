@@ -6,22 +6,30 @@
 <title>Verin Aberto | Poboacion</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
+  @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap");
+
   :root {
     color-scheme: light;
-    --bg: #f3f4f8;
-    --surface: #fbfaf6;
+    --bg: #f5f9fb;
+    --surface: rgba(255, 255, 255, 0.9);
     --surface-strong: #ffffff;
-    --border: #d9deea;
-    --text: #172033;
-    --muted: #5f6b85;
-    --accent: #157a6e;
-    --accent-soft: rgba(21, 122, 110, 0.14);
-    --accent-2: #3b82f6;
-    --accent-3: #d97706;
-    --accent-4: #8b5cf6;
-    --danger: #b91c1c;
-    --ink-soft: #eef2fb;
-    --shadow: 0 20px 50px rgba(23, 32, 51, 0.08);
+    --border: rgba(32, 84, 137, 0.16);
+    --border-strong: rgba(20, 62, 107, 0.28);
+    --text: #0e2c4a;
+    --muted: #5f7891;
+    --blue-900: #123f73;
+    --blue-700: #1f5f9d;
+    --blue-500: #3e87c9;
+    --blue-300: #9bc6e8;
+    --green-700: #1f7a63;
+    --green-500: #33a17b;
+    --green-200: #c7eadc;
+    --white-soft: #eef6fb;
+    --danger: #a11d34;
+    --shadow: 0 24px 60px rgba(14, 44, 74, 0.12);
+    --radius-xl: 28px;
+    --radius-lg: 20px;
+    --radius-md: 14px;
   }
 
   * {
@@ -30,122 +38,114 @@
 
   body {
     margin: 0;
-    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: "Manrope", "Segoe UI", sans-serif;
     background:
-      radial-gradient(circle at top left, rgba(59, 130, 246, 0.08), transparent 28%),
-      radial-gradient(circle at top right, rgba(217, 119, 6, 0.08), transparent 24%),
-      linear-gradient(180deg, #f8f9fc 0%, var(--bg) 100%);
+      radial-gradient(circle at top left, rgba(62, 135, 201, 0.16), transparent 28%),
+      radial-gradient(circle at top right, rgba(51, 161, 123, 0.14), transparent 24%),
+      linear-gradient(180deg, #f9fdff 0%, var(--bg) 45%, #eef5f8 100%);
     color: var(--text);
   }
 
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(18, 63, 115, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(18, 63, 115, 0.025) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.32), transparent 82%);
+  }
+
   .container {
-    max-width: 1280px;
+    max-width: 1320px;
     margin: 0 auto;
-    padding: 40px 20px 56px;
+    padding: 32px 20px 56px;
   }
 
   .hero {
-    display: grid;
-    gap: 18px;
-    grid-template-columns: 1fr;
-    align-items: start;
-    margin-bottom: 28px;
+    margin-bottom: 26px;
   }
 
   .hero-copy {
-    padding: 28px 30px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 255, 0.88));
-    border: 1px solid rgba(217, 222, 234, 0.95);
-    border-radius: 18px;
+    position: relative;
+    overflow: hidden;
+    padding: 32px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-xl);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(237, 247, 255, 0.92)),
+      linear-gradient(180deg, rgba(31, 95, 157, 0.04), rgba(51, 161, 123, 0.02));
     box-shadow: var(--shadow);
+  }
+
+  .hero-copy::after {
+    content: "";
+    position: absolute;
+    inset: auto -60px -80px auto;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(51, 161, 123, 0.18), transparent 68%);
   }
 
   .eyebrow {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 14px;
-    padding: 7px 12px;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding: 8px 14px;
+    border: 1px solid rgba(31, 95, 157, 0.14);
     border-radius: 999px;
-    background: rgba(21, 122, 110, 0.1);
-    color: var(--accent);
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--blue-700);
+    font-family: "Space Grotesk", sans-serif;
     font-size: 0.82rem;
     font-weight: 700;
-    letter-spacing: 0;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue-500), var(--green-500));
+  }
+
+  .hero-copy h1,
+  .section-heading h2,
+  .filters h2,
+  .chart-card h2 {
+    font-family: "Space Grotesk", sans-serif;
   }
 
   .hero-copy h1 {
-    margin: 0 0 10px;
-    font-size: clamp(2rem, 4vw, 3.4rem);
-    line-height: 0.98;
+    margin: 0 0 12px;
+    max-width: 8ch;
+    font-size: clamp(2.8rem, 7vw, 5rem);
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
   }
 
   .hero-copy p {
     margin: 0;
-    max-width: 66ch;
+    max-width: 70ch;
     color: var(--muted);
     font-size: 1.02rem;
-    line-height: 1.65;
-  }
-
-  .panel {
-    background: var(--surface-strong);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    box-shadow: var(--shadow);
-  }
-
-  .filters h2,
-  .chart-card h2 {
-    margin: 0 0 14px;
-    font-size: 1.05rem;
-  }
-
-  .filter-grid {
-    display: grid;
-    gap: 12px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .field {
-    display: grid;
-    gap: 6px;
-  }
-
-  .field.full {
-    grid-column: 1 / -1;
-  }
-
-  label {
-    font-size: 0.84rem;
-    font-weight: 600;
-    color: var(--muted);
-    text-transform: uppercase;
-  }
-
-  select,
-  button {
-    width: 100%;
-    min-height: 44px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    font: inherit;
-  }
-
-  select {
-    padding: 0 14px;
-    background: #f9fbff;
-    color: var(--text);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    line-height: 1.72;
   }
 
   .status {
-    margin-top: 16px;
+    margin-top: 20px;
     min-height: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(32, 84, 137, 0.12);
     color: var(--muted);
     font-size: 0.92rem;
-    padding-top: 14px;
-    border-top: 1px solid rgba(217, 222, 234, 0.8);
   }
 
   .status.error {
@@ -157,23 +157,95 @@
     gap: 22px;
   }
 
+  .section-heading {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    align-items: flex-end;
+  }
+
+  .section-heading h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .section-heading p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .panel {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-strong);
+    box-shadow: var(--shadow);
+  }
+
   .filters {
-    padding: 22px 24px;
-    background: linear-gradient(180deg, rgba(251, 250, 246, 0.9), rgba(255, 255, 255, 0.98));
+    padding: 24px;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(239, 248, 254, 0.9));
+  }
+
+  .filter-grid {
+    display: grid;
+    gap: 12px;
+    margin-top: 16px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .field {
+    display: grid;
+    gap: 6px;
+  }
+
+  label {
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  select,
+  button {
+    width: 100%;
+    min-height: 48px;
+    border-radius: 12px;
+    border: 1px solid rgba(31, 95, 157, 0.14);
+    font: inherit;
+  }
+
+  select {
+    padding: 0 14px;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--text);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.88);
+  }
+
+  .footer-note {
+    margin-top: 16px;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.55;
   }
 
   .kpi-grid {
     display: grid;
     gap: 18px;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   }
 
   .kpi {
-    padding: 22px;
     position: relative;
     overflow: hidden;
+    padding: 22px;
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(248, 250, 255, 0.98));
+      linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(244, 250, 255, 0.96));
   }
 
   .kpi::before {
@@ -181,28 +253,32 @@
     position: absolute;
     inset: 0 auto auto 0;
     width: 100%;
-    height: 4px;
-    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    height: 5px;
+    background: linear-gradient(90deg, var(--blue-700), var(--green-500));
   }
 
   .kpi-label {
     margin: 0 0 10px;
     color: var(--muted);
-    font-size: 0.88rem;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
   .kpi-value {
     margin: 0;
-    font-size: clamp(1.7rem, 3vw, 2.4rem);
-    line-height: 1.05;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
   }
 
   .kpi-trend {
     margin-top: 10px;
     color: var(--muted);
-    font-size: 0.88rem;
-    line-height: 1.45;
+    font-size: 0.9rem;
+    line-height: 1.5;
   }
 
   .charts-grid {
@@ -214,14 +290,18 @@
   .chart-card {
     padding: 22px 22px 18px;
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(248, 250, 255, 0.96));
+      linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(243, 249, 255, 0.98));
+  }
+
+  .chart-card.wide {
+    grid-column: 1 / -1;
   }
 
   .chart-card p {
-    margin: -2px 0 18px;
+    margin: 4px 0 18px;
     color: var(--muted);
     font-size: 0.92rem;
-    line-height: 1.5;
+    line-height: 1.55;
   }
 
   .chart-wrap {
@@ -236,32 +316,20 @@
     height: 500px;
   }
 
-  .empty-state {
-    padding: 24px;
-    border: 1px dashed var(--border);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.6);
-    color: var(--muted);
-    text-align: center;
-  }
-
-  .footer-note {
-    margin-top: 12px;
-    color: var(--muted);
-    font-size: 0.88rem;
-    line-height: 1.5;
+  .chart-wrap.medium {
+    min-height: 380px;
+    height: 380px;
   }
 
   @media (max-width: 1080px) {
-    .charts-grid,
-    .kpi-grid {
+    .charts-grid {
       grid-template-columns: 1fr;
     }
   }
 
   @media (max-width: 720px) {
     .container {
-      padding: 24px 16px 40px;
+      padding: 20px 16px 40px;
     }
 
     .hero-copy,
@@ -272,11 +340,16 @@
       padding-right: 18px;
     }
 
+    .section-heading {
+      display: grid;
+    }
+
     .filter-grid {
       grid-template-columns: 1fr;
     }
 
     .chart-wrap,
+    .chart-wrap.medium,
     .chart-wrap.tall {
       min-height: 360px;
       height: 360px;
@@ -288,21 +361,26 @@
 <div class="container">
   <section class="hero">
     <div class="hero-copy">
-      <div class="eyebrow">Comarca de Verin · Dashboard demografico</div>
+      <div class="eyebrow">Comarca de Verin · Atlas demografico</div>
       <h1>Verin Aberto</h1>
       <p>
-        Un panel visual para explorar la evolucion demografica de la comarca: poblacion,
-        saldo vexetativo, estructura por edades y origen de la poblacion en una sola vista.
+        Un panel visual para seguir a evolucion demografica da comarca con foco en poboacion,
+        saldo vexetativo, estrutura por idades, indice de envellecemento e lugar de nacemento.
       </p>
       <div id="status" class="status">
-        Cargando configuracion del dashboard...
+        Cargando configuracion do dashboard...
       </div>
     </div>
   </section>
 
   <section class="dashboard-shell">
     <section class="panel filters">
-      <h2>Filtros</h2>
+      <div class="section-heading">
+        <div>
+          <h2>Filtros</h2>
+          <p>Explora cada municipio e cambia o ano de detalle para comparar estrutura e procedencia.</p>
+        </div>
+      </div>
       <div class="filter-grid">
         <div class="field">
           <label for="municipio-select">Municipio</label>
@@ -318,7 +396,7 @@
         </div>
       </div>
       <div class="footer-note">
-        La evolucion temporal usa toda la serie del municipio. Los graficos de edad y lugar usan el ano seleccionado.
+        A evolucion temporal usa toda a serie do municipio. Os graficos de idade e procedencia usan o ano seleccionado.
       </div>
     </section>
 
@@ -326,7 +404,7 @@
       <article class="panel kpi">
         <p class="kpi-label">Poboacion total</p>
         <h2 class="kpi-value" id="kpi-total">--</h2>
-        <div class="kpi-trend" id="kpi-total-trend">Sin datos cargados</div>
+        <div class="kpi-trend" id="kpi-total-trend">Sen datos cargados</div>
       </article>
       <article class="panel kpi">
         <p class="kpi-label">Homes</p>
@@ -337,6 +415,11 @@
         <p class="kpi-label">Mulleres</p>
         <h2 class="kpi-value" id="kpi-mujeres">--</h2>
         <div class="kpi-trend" id="kpi-mujeres-share">--</div>
+      </article>
+      <article class="panel kpi">
+        <p class="kpi-label">Indice de envellecemento</p>
+        <h2 class="kpi-value" id="kpi-aging">--</h2>
+        <div class="kpi-trend" id="kpi-aging-detail">Persoas de 65+ por cada 100 menores de 15 anos</div>
       </article>
       <article class="panel kpi">
         <p class="kpi-label">Saldo vexetativo</p>
@@ -362,6 +445,14 @@
         </div>
       </article>
 
+      <article class="panel chart-card wide">
+        <h2>Evolucion por grupos de idade</h2>
+        <p>Seguimento dos grandes tramos demograficos: infancia, idade activa e maiores.</p>
+        <div class="chart-wrap medium">
+          <canvas id="age-trend-chart"></canvas>
+        </div>
+      </article>
+
       <article class="panel chart-card">
         <h2>Estrutura por idade</h2>
         <p>Distribucion da poboacion no ano seleccionado.</p>
@@ -372,7 +463,7 @@
 
       <article class="panel chart-card">
         <h2>Lugar de nacemento</h2>
-        <p>Composicion da poboacion por procedencia no ano seleccionado.</p>
+        <p>Os nados en Galicia comparten tons proximos para diferencialos do resto de Espana e do estranxeiro.</p>
         <div class="chart-wrap tall">
           <canvas id="origin-chart"></canvas>
         </div>
@@ -383,6 +474,11 @@
 
 <script>
   const DATA_URL = "./data/dashboard.json";
+  const AGE_BUCKETS = [
+    { key: "0-14", label: "0-14", min: 0, max: 14, color: "#9bc6e8" },
+    { key: "15-64", label: "15-64", min: 15, max: 64, color: "#1f5f9d" },
+    { key: "65+", label: "65+", min: 65, max: Infinity, color: "#33a17b" }
+  ];
 
   const state = {
     dataset: null,
@@ -393,6 +489,7 @@
     charts: {
       population: null,
       vital: null,
+      ageTrend: null,
       age: null,
       origin: null
     },
@@ -401,6 +498,7 @@
       births: [],
       deaths: [],
       age: [],
+      ageTrend: [],
       origin: []
     }
   };
@@ -415,6 +513,8 @@
     kpiHombresShare: document.getElementById("kpi-hombres-share"),
     kpiMujeres: document.getElementById("kpi-mujeres"),
     kpiMujeresShare: document.getElementById("kpi-mujeres-share"),
+    kpiAging: document.getElementById("kpi-aging"),
+    kpiAgingDetail: document.getElementById("kpi-aging-detail"),
     kpiSaldo: document.getElementById("kpi-saldo"),
     kpiSaldoDetail: document.getElementById("kpi-saldo-detail")
   };
@@ -439,14 +539,14 @@
         labels: {
           usePointStyle: true,
           boxWidth: 10,
-          color: "#51607a",
+          color: "#4b6884",
           padding: 16
         }
       },
       tooltip: {
-        backgroundColor: "rgba(23, 32, 51, 0.94)",
+        backgroundColor: "rgba(14, 44, 74, 0.96)",
         titleColor: "#ffffff",
-        bodyColor: "#eaf0ff",
+        bodyColor: "#eff7ff",
         padding: 12,
         cornerRadius: 10,
         displayColors: true
@@ -454,13 +554,13 @@
     },
     scales: {
       x: {
-        ticks: { color: "#5f6b85", padding: 8 },
+        ticks: { color: "#5f7891", padding: 8 },
         grid: { display: false, drawBorder: false },
         border: { display: false }
       },
       y: {
-        ticks: { color: "#5f6b85", padding: 10 },
-        grid: { color: "rgba(148, 163, 184, 0.18)", drawBorder: false },
+        ticks: { color: "#5f7891", padding: 10 },
+        grid: { color: "rgba(31, 95, 157, 0.12)", drawBorder: false },
         border: { display: false }
       }
     }
@@ -491,6 +591,17 @@
     }).format(value);
   }
 
+  function formatDecimal(value, fractionDigits = 1) {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) {
+      return "--";
+    }
+
+    return new Intl.NumberFormat("gl-ES", {
+      minimumFractionDigits: fractionDigits,
+      maximumFractionDigits: fractionDigits
+    }).format(value);
+  }
+
   function getYearFromDate(dateString) {
     return Number(String(dateString).slice(0, 4));
   }
@@ -510,13 +621,155 @@
     return [...new Set(rows.map(row => getYearFromDate(row.id_fecha)))].sort((a, b) => a - b);
   }
 
+  function getAgeRangeBounds(label) {
+    const normalized = normalizeText(label);
+
+    if (normalized.includes("e mais")) {
+      const minValue = Number.parseInt(normalized, 10);
+      return Number.isNaN(minValue) ? null : { min: minValue, max: Infinity };
+    }
+
+    const match = normalized.match(/(\d+)\s*-\s*(\d+)/);
+    if (!match) {
+      return null;
+    }
+
+    return {
+      min: Number(match[1]),
+      max: Number(match[2])
+    };
+  }
+
+  function getAgeBucketForRow(row) {
+    const bounds = getAgeRangeBounds(row.rango);
+    if (!bounds) {
+      return null;
+    }
+
+    return AGE_BUCKETS.find(bucket => bounds.min >= bucket.min && bounds.max <= bucket.max) || null;
+  }
+
+  function buildAgeTrend(ageByYear) {
+    return Object.entries(ageByYear || {})
+      .sort((a, b) => Number(a[0]) - Number(b[0]))
+      .map(([year, rows]) => {
+        const totals = AGE_BUCKETS.reduce((accumulator, bucket) => {
+          accumulator[bucket.key] = 0;
+          return accumulator;
+        }, {});
+
+        (rows || []).forEach(row => {
+          const bucket = getAgeBucketForRow(row);
+          if (bucket) {
+            totals[bucket.key] += Number(row.poblacion_total || 0);
+          }
+        });
+
+        return {
+          year: Number(year),
+          ...totals
+        };
+      });
+  }
+
+  function getAgingIndex(rows) {
+    let youngerThan15 = 0;
+    let olderThan64 = 0;
+
+    (rows || []).forEach(row => {
+      const bucket = getAgeBucketForRow(row);
+      const population = Number(row.poblacion_total || 0);
+
+      if (!bucket) {
+        return;
+      }
+
+      if (bucket.key === "0-14") {
+        youngerThan15 += population;
+      }
+
+      if (bucket.key === "65+") {
+        olderThan64 += population;
+      }
+    });
+
+    if (!youngerThan15) {
+      return null;
+    }
+
+    return (olderThan64 / youngerThan15) * 100;
+  }
+
+  function getAgingDetail(rows) {
+    let youngerThan15 = 0;
+    let olderThan64 = 0;
+
+    (rows || []).forEach(row => {
+      const bucket = getAgeBucketForRow(row);
+      const population = Number(row.poblacion_total || 0);
+
+      if (!bucket) {
+        return;
+      }
+
+      if (bucket.key === "0-14") {
+        youngerThan15 += population;
+      }
+
+      if (bucket.key === "65+") {
+        olderThan64 += population;
+      }
+    });
+
+    if (!youngerThan15) {
+      return "Sen base menor de 15 anos para calcular o indice";
+    }
+
+    return `${formatNumber(olderThan64)} persoas de 65+ por ${formatNumber(youngerThan15)} menores de 15 anos`;
+  }
+
+  function classifyOrigin(label) {
+    const normalized = normalizeText(label);
+
+    if (
+      normalized.includes("no concello de residencia")
+      || normalized.includes("mesma provincia")
+      || normalized.includes("provincia de galicia")
+    ) {
+      return "galicia";
+    }
+
+    if (normalized.includes("estranxeiro")) {
+      return "foreign";
+    }
+
+    return "spain";
+  }
+
+  function getOriginColor(row, index) {
+    const category = classifyOrigin(row.nombre);
+
+    if (category === "galicia") {
+      const palette = ["#123f73", "#1f5f9d", "#3e87c9"];
+      return palette[index % palette.length];
+    }
+
+    if (category === "foreign") {
+      return "#33a17b";
+    }
+
+    return "#8eb9a8";
+  }
+
   function resetKPIs() {
     elements.kpiTotal.textContent = "--";
-    elements.kpiTotalTrend.textContent = "Sin datos cargados";
+    elements.kpiTotalTrend.textContent = "Sen datos cargados";
     elements.kpiHombres.textContent = "--";
     elements.kpiHombresShare.textContent = "--";
     elements.kpiMujeres.textContent = "--";
     elements.kpiMujeresShare.textContent = "--";
+    elements.kpiAging.textContent = "--";
+    elements.kpiAgingDetail.textContent = "Persoas de 65+ por cada 100 menores de 15 anos";
     elements.kpiSaldo.textContent = "--";
     elements.kpiSaldoDetail.textContent = "Nacementos - Defuncions";
   }
@@ -530,6 +783,7 @@
     state.charts = {
       population: null,
       vital: null,
+      ageTrend: null,
       age: null,
       origin: null
     };
@@ -551,11 +805,11 @@
     try {
       payload = await response.json();
     } catch (error) {
-      throw new Error("No se pudo leer el archivo de datos del dashboard.");
+      throw new Error("Non se puido ler o arquivo de datos do dashboard.");
     }
 
     if (!response.ok) {
-      throw new Error(payload.error || "No se pudo completar la solicitud.");
+      throw new Error(payload.error || "Non se puido completar a solicitude.");
     }
 
     return payload;
@@ -587,7 +841,7 @@
     }));
   }
 
-  function updateKPIs(populationRows, birthsRows, deathsRows, selectedYear) {
+  function updateKPIs(populationRows, birthsRows, deathsRows, ageRows, selectedYear) {
     const currentRow = [...populationRows].reverse().find(row => getYearFromDate(row.id_fecha) === Number(selectedYear));
     const previousRow = [...populationRows].reverse().find(row => getYearFromDate(row.id_fecha) < Number(selectedYear));
     const births = birthsRows.find(row => getYearFromDate(row.id_fecha) === Number(selectedYear))?.nacimientos_total || 0;
@@ -595,7 +849,7 @@
 
     if (!currentRow) {
       resetKPIs();
-      elements.kpiTotalTrend.textContent = "No hay registro de poblacion para el ano seleccionado";
+      elements.kpiTotalTrend.textContent = "Non hai rexistro de poboacion para o ano seleccionado";
       return;
     }
 
@@ -603,15 +857,18 @@
     const hombres = currentRow.hombres || 0;
     const mujeres = currentRow.mujeres || 0;
     const variation = previousRow ? total - (previousRow.poblacion_total || 0) : null;
+    const agingIndex = getAgingIndex(ageRows);
 
     elements.kpiTotal.textContent = formatNumber(total);
     elements.kpiTotalTrend.textContent = variation === null
-      ? "Primer ano disponible en la serie"
+      ? "Primeiro ano dispoñible na serie"
       : `${variation >= 0 ? "+" : ""}${formatNumber(variation)} vs ${getYearFromDate(previousRow.id_fecha)}`;
     elements.kpiHombres.textContent = formatNumber(hombres);
     elements.kpiHombresShare.textContent = `${formatPercent(total ? hombres / total : 0)} do total`;
     elements.kpiMujeres.textContent = formatNumber(mujeres);
     elements.kpiMujeresShare.textContent = `${formatPercent(total ? mujeres / total : 0)} do total`;
+    elements.kpiAging.textContent = agingIndex === null ? "--" : formatDecimal(agingIndex);
+    elements.kpiAgingDetail.textContent = getAgingDetail(ageRows);
     elements.kpiSaldo.textContent = `${births - deaths >= 0 ? "+" : ""}${formatNumber(births - deaths)}`;
     elements.kpiSaldoDetail.textContent = `${formatNumber(births)} nacementos e ${formatNumber(deaths)} defuncions`;
   }
@@ -625,8 +882,8 @@
           {
             label: "Poboacion total",
             data: rows.map(row => row.poblacion_total),
-            borderColor: "#157a6e",
-            backgroundColor: "rgba(21, 122, 110, 0.12)",
+            borderColor: "#123f73",
+            backgroundColor: "rgba(31, 95, 157, 0.12)",
             tension: 0.3,
             fill: true,
             pointRadius: 3
@@ -634,16 +891,16 @@
           {
             label: "Homes",
             data: rows.map(row => row.hombres),
-            borderColor: "#3b82f6",
-            backgroundColor: "#3b82f6",
+            borderColor: "#3e87c9",
+            backgroundColor: "#3e87c9",
             tension: 0.3,
             pointRadius: 2
           },
           {
             label: "Mulleres",
             data: rows.map(row => row.mujeres),
-            borderColor: "#d97706",
-            backgroundColor: "#d97706",
+            borderColor: "#33a17b",
+            backgroundColor: "#33a17b",
             tension: 0.3,
             pointRadius: 2
           }
@@ -662,16 +919,36 @@
           {
             label: "Nacementos",
             data: rows.map(row => row.births),
-            backgroundColor: "rgba(59, 130, 246, 0.8)",
-            borderRadius: 6
+            backgroundColor: "rgba(62, 135, 201, 0.85)",
+            borderRadius: 8
           },
           {
             label: "Defuncions",
             data: rows.map(row => row.deaths),
-            backgroundColor: "rgba(217, 119, 6, 0.8)",
-            borderRadius: 6
+            backgroundColor: "rgba(31, 122, 99, 0.8)",
+            borderRadius: 8
           }
         ]
+      },
+      options: chartDefaults
+    });
+  }
+
+  function renderAgeTrendChart(rows) {
+    state.charts.ageTrend = createChart("age-trend-chart", {
+      type: "line",
+      data: {
+        labels: rows.map(row => row.year),
+        datasets: AGE_BUCKETS.map(bucket => ({
+          label: bucket.label,
+          data: rows.map(row => row[bucket.key] || 0),
+          borderColor: bucket.color,
+          backgroundColor: bucket.color,
+          tension: 0.28,
+          fill: false,
+          pointRadius: 2.5,
+          pointHoverRadius: 4
+        }))
       },
       options: chartDefaults
     });
@@ -686,7 +963,7 @@
           {
             label: "Homes",
             data: rows.map(row => row.hombres || 0),
-            backgroundColor: "rgba(59, 130, 246, 0.8)",
+            backgroundColor: "rgba(62, 135, 201, 0.82)",
             borderRadius: 6,
             borderSkipped: false,
             categoryPercentage: 0.72,
@@ -696,7 +973,7 @@
           {
             label: "Mulleres",
             data: rows.map(row => row.mujeres || 0),
-            backgroundColor: "rgba(139, 92, 246, 0.8)",
+            backgroundColor: "rgba(51, 161, 123, 0.82)",
             borderRadius: 6,
             borderSkipped: false,
             categoryPercentage: 0.72,
@@ -725,7 +1002,7 @@
             ...chartDefaults.scales.x,
             offset: true,
             ticks: {
-              color: "#5f6b85",
+              color: "#5f7891",
               padding: 10,
               autoSkip: false
             }
@@ -743,17 +1020,9 @@
         datasets: [
           {
             data: rows.map(row => row.poblacion_total || 0),
-            backgroundColor: [
-              "#157a6e",
-              "#3b82f6",
-              "#d97706",
-              "#8b5cf6",
-              "#ef4444",
-              "#0f766e",
-              "#eab308",
-              "#6b7280"
-            ],
-            borderWidth: 0
+            backgroundColor: rows.map((row, index) => getOriginColor(row, index)),
+            borderColor: "#ffffff",
+            borderWidth: 3
           }
         ]
       },
@@ -774,14 +1043,14 @@
             labels: {
               usePointStyle: true,
               boxWidth: 10,
-              color: "#51607a",
+              color: "#4b6884",
               padding: 14
             }
           },
           tooltip: {
-            backgroundColor: "rgba(23, 32, 51, 0.94)",
+            backgroundColor: "rgba(14, 44, 74, 0.96)",
             titleColor: "#ffffff",
-            bodyColor: "#eaf0ff",
+            bodyColor: "#eff7ff",
             padding: 12,
             cornerRadius: 10
           }
@@ -791,21 +1060,22 @@
   }
 
   async function loadMunicipioDashboard(municipioId, preferredYear) {
-    setStatus("Cargando series y actualizando graficos...");
+    setStatus("Cargando series e actualizando graficos...");
 
     try {
       const municipioSeries = getMunicipioSeries(municipioId);
 
       if (!municipioSeries) {
-        throw new Error("No hay datos exportados para ese municipio.");
+        throw new Error("Non hai datos exportados para ese municipio.");
       }
 
       const populationRows = sortRowsByDate(municipioSeries.population || []);
       const birthsRows = sortRowsByDate(municipioSeries.births || []);
       const deathsRows = sortRowsByDate(municipioSeries.deaths || []);
+      const ageTrendRows = buildAgeTrend(municipioSeries.age_by_year || {});
 
       if (!populationRows.length) {
-        throw new Error("Ese municipio no tiene registros en fact_poblacion.");
+        throw new Error("Ese municipio non ten rexistros en fact_poblacion.");
       }
 
       const years = dedupeYears(populationRows);
@@ -818,6 +1088,7 @@
       state.series.population = populationRows;
       state.series.births = birthsRows;
       state.series.deaths = deathsRows;
+      state.series.ageTrend = ageTrendRows;
       state.years = years;
       state.selectedMunicipio = String(municipioId);
       state.selectedYear = String(selectedYear);
@@ -831,9 +1102,10 @@
       destroyCharts();
       renderPopulationChart(populationRows);
       renderVitalChart(mergeVitalSeries(years, birthsRows, deathsRows));
+      renderAgeTrendChart(ageTrendRows);
       renderAgeChart(ageRows);
       renderOriginChart(originRows);
-      updateKPIs(populationRows, birthsRows, deathsRows, selectedYear);
+      updateKPIs(populationRows, birthsRows, deathsRows, ageRows, selectedYear);
 
       const municipioNombre = state.municipios.find(item => String(item.id_municipio) === String(municipioId))?.nombre || "Municipio";
       const generatedAt = state.dataset?.generated_at ? ` Datos exportados: ${state.dataset.generated_at}.` : "";
@@ -846,14 +1118,14 @@
   }
 
   async function connectAndBootstrap() {
-    setStatus("Cargando datos estaticos del dashboard...");
+    setStatus("Cargando datos estaticos do dashboard...");
 
     try {
       const payload = await fetchJson(DATA_URL);
       const municipios = payload.municipios || [];
 
       if (!municipios.length) {
-        throw new Error("No se encontraron municipios en el archivo de datos.");
+        throw new Error("Non se atoparon municipios no arquivo de datos.");
       }
 
       state.dataset = payload;
