@@ -11,8 +11,8 @@ echo "Activando entorno virtual..."
 source venv/bin/activate
 
 echo "Instalando librerías..."
-pip install --upgrade pip
-pip install -r requirements.txt
+pip install --upgrade pip -q
+pip install -r requirements.txt -q
 
 for script in etl/*.py; do
     echo "Ejecutando $script..."
