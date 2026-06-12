@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import date, datetime
+from decimal import Decimal
 from pathlib import Path
 
 import psycopg2
@@ -9,9 +10,11 @@ from dotenv import load_dotenv
 
 
 BASE_DIR = Path(__file__).resolve().parent
-OUTPUT_PATH = BASE_DIR / "docs" / "data" / "dashboard.json"
+ROOT_DIR = BASE_DIR.parent
+OUTPUT_PATH = ROOT_DIR / "docs" / "data" / "dashboard.json"
 
 load_dotenv(BASE_DIR / ".env", override=True)
+load_dotenv(ROOT_DIR / ".env", override=True)
 
 USER = os.getenv("user")
 PASSWORD = os.getenv("password")
@@ -27,7 +30,9 @@ if not DATABASE_URL and all([USER, PASSWORD, HOST, PORT, DBNAME]):
 def json_default(value):
     if isinstance(value, (date, datetime)):
         return value.isoformat()
-    return value
+    if isinstance(value, Decimal):
+        return float(value)
+    raise TypeError(f"Object of type {type(value).__name__} is not JSON serializable")
 
 
 def normalize_text(value):
@@ -144,6 +149,52 @@ def fetch_origin_rows(municipio_id):
     )
 
 
+def fetch_economic_sector_rows(municipio_id):
+    return fetch_all(
+        """
+        SELECT
+            f.id_fecha,
+            f.empresas_total,
+            s.nombre AS sector,
+            t.nombre AS tipo_empresa
+        FROM verin_dw.fact_empresas_sector f
+        JOIN verin_dw.dim_sector_economico s ON s.id_sector_economico = f.id_sector_economico
+        JOIN verin_dw.dim_tipo_empresa t ON t.id_tipo_empresa = f.id_tipo_empresa
+        WHERE f.id_municipio = %s
+        ORDER BY f.id_fecha ASC, s.nombre ASC, t.nombre ASC
+        """,
+        (municipio_id,),
+    )
+
+
+def fetch_economic_employee_rows(municipio_id):
+    return fetch_all(
+        """
+        SELECT
+            f.id_fecha,
+            f.empresas_total,
+            r.rango
+        FROM verin_dw.fact_empresas_asalariados f
+        JOIN verin_dw.dim_rango_asalariados r ON r.id_rango_asalariados = f.id_rango_asalariados
+        WHERE f.id_municipio = %s
+        ORDER BY f.id_fecha ASC, f.id_rango_asalariados ASC
+        """,
+        (municipio_id,),
+    )
+
+
+def fetch_economic_macro_rows(municipio_id):
+    return fetch_all(
+        """
+        SELECT id_fecha, renta_bruta_per_capita, pib_per_capita
+        FROM verin_dw.fact_macros_economicos
+        WHERE id_municipio = %s
+        ORDER BY id_fecha ASC
+        """,
+        (municipio_id,),
+    )
+
+
 def latest_rows_by_year(rows):
     grouped = {}
     latest_dates = {}
@@ -180,6 +231,9 @@ def build_payload():
         deaths = fetch_deaths(municipio["id_municipio"])
         age_rows = fetch_age_rows(municipio["id_municipio"])
         origin_rows = fetch_origin_rows(municipio["id_municipio"])
+        economic_sector_rows = fetch_economic_sector_rows(municipio["id_municipio"])
+        economic_employee_rows = fetch_economic_employee_rows(municipio["id_municipio"])
+        economic_macro_rows = fetch_economic_macro_rows(municipio["id_municipio"])
 
         payload["series"][municipio_id] = {
             "population": population,
@@ -187,6 +241,11 @@ def build_payload():
             "deaths": deaths,
             "age_by_year": latest_rows_by_year(age_rows),
             "origin_by_year": latest_rows_by_year(origin_rows),
+            "economy": {
+                "companies_by_sector_year": latest_rows_by_year(economic_sector_rows),
+                "companies_by_employee_year": latest_rows_by_year(economic_employee_rows),
+                "macros": economic_macro_rows,
+            },
         }
 
     return payload

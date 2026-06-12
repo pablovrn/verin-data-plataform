@@ -8,7 +8,7 @@ Este proyecto incluye un dashboard web estatico en `docs/index.html`, pensado pa
 2. Instala dependencias:
    `pip install -r requirements.txt`
 3. Exporta los datos estaticos:
-   `python3 export_dashboard_data.py`
+   `python3 procesos/export_dashboard_data.py`
 4. Publica la carpeta `docs/` en GitHub Pages.
 
 La web no expone credenciales en el navegador. Los datos se consultan desde PostgreSQL/Supabase solo durante la exportacion y se guardan en `docs/data/dashboard.json`.
