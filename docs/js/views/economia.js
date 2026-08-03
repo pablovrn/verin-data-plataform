@@ -270,7 +270,7 @@ export const economyView = {
   label: "Economia",
   eyebrow: "Comarca de Verin · Atlas economico",
   description: "Indicadores para analizar tecido empresarial, estrutura por sectores e asalariados, e evolucion de PIB e renda per capita.",
-  filtersDescription: "Explora cada municipio e cambia o ano de detalle para comparar empresas e indicadores macroeconomicos.",
+  filtersDescription: "Explora cada concello e cambia o ano de detalle para comparar empresas e indicadores macroeconomicos.",
   note: "As graficas por sector, asalariados e tipo de empresa usan o ano seleccionado. PIB e renda mostran a serie macroeconomica dispoñible.",
   getYears: getAvailableYears,
   render({ municipioSeries, selectedYear, kpiGrid, chartsGrid }) {

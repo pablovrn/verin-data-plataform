@@ -389,7 +389,7 @@ export const populationView = {
   label: "Poboacion",
   eyebrow: "Comarca de Verin · Atlas demografico",
   description: "Un panel visual para seguir a evolucion demografica da comarca con foco en poboacion, saldo vexetativo, estrutura por idades, indice de envellecemento e lugar de nacemento.",
-  filtersDescription: "Explora cada municipio e cambia o ano de detalle para comparar estrutura e procedencia.",
+  filtersDescription: "Explora cada concello e cambia o ano de detalle para comparar estrutura e procedencia.",
   note: "A evolucion temporal usa toda a serie do municipio. Os graficos de idade e procedencia usan o ano seleccionado. So existen datos de idade e procedencia para 2001, 2011 e dende 2021 en diante.",
   getYears: getAvailableYears,
   render({ municipioSeries, selectedYear, kpiGrid, chartsGrid }) {

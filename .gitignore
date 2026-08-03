@@ -4,3 +4,4 @@ __pycache__/
 venv/
 _certDB/
 _config/
+.DS_Store
