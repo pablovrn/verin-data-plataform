@@ -1,12 +1,14 @@
 import { economyView } from "./views/economia.js";
 import { populationView } from "./views/poblacion.js";
+import { servicesView } from "./views/servicios.js";
 import { normalizeText, destroyCharts } from "./utils.js";
 
 const DATA_URL = "./data/dashboard.json";
 
 const views = {
   population: populationView,
-  economy: economyView
+  economy: economyView,
+  services: servicesView
 };
 
 const state = {

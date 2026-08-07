@@ -195,6 +195,38 @@ def fetch_economic_macro_rows(municipio_id):
     )
 
 
+def fetch_healthcare_rows(municipio_id):
+    return fetch_all(
+        """
+        SELECT
+            f.id_fecha,
+            f.total,
+            d.nombre AS tipo_sanitario
+        FROM verin_dw.fact_personal_sanitario f
+        JOIN verin_dw.dim_tipo_sanitario d ON d.id_tipo_sanitario = f.id_tipo_sanitario
+        WHERE f.id_municipio = %s
+        ORDER BY f.id_fecha ASC, d.nombre ASC
+        """,
+        (municipio_id,),
+    )
+
+
+def fetch_education_rows(municipio_id):
+    return fetch_all(
+        """
+        SELECT
+            f.id_fecha,
+            f.total,
+            d.nombre AS tipo_educacion
+        FROM verin_dw.fact_alumnos_tipo_educacion f
+        JOIN verin_dw.dim_tipo_educacion d ON d.id_tipo_educacion = f.id_tipo_educacion
+        WHERE f.id_municipio = %s
+        ORDER BY f.id_fecha ASC, d.nombre ASC
+        """,
+        (municipio_id,),
+    )
+
+
 def latest_rows_by_year(rows):
     grouped = {}
     latest_dates = {}
@@ -234,6 +266,8 @@ def build_payload():
         economic_sector_rows = fetch_economic_sector_rows(municipio["id_municipio"])
         economic_employee_rows = fetch_economic_employee_rows(municipio["id_municipio"])
         economic_macro_rows = fetch_economic_macro_rows(municipio["id_municipio"])
+        healthcare_rows = fetch_healthcare_rows(municipio["id_municipio"])
+        education_rows = fetch_education_rows(municipio["id_municipio"])
 
         payload["series"][municipio_id] = {
             "population": population,
@@ -245,6 +279,10 @@ def build_payload():
                 "companies_by_sector_year": latest_rows_by_year(economic_sector_rows),
                 "companies_by_employee_year": latest_rows_by_year(economic_employee_rows),
                 "macros": economic_macro_rows,
+            },
+            "services": {
+                "healthcare_by_year": latest_rows_by_year(healthcare_rows),
+                "education_by_year": latest_rows_by_year(education_rows),
             },
         }
 
