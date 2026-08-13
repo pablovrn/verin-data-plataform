@@ -20,6 +20,8 @@ const state = {
   charts: {}
 };
 
+const CHAT_URL = "http://localhost:8000/chat";
+
 const elements = {
   status: document.getElementById("status"),
   heroEyebrow: document.getElementById("hero-eyebrow"),
@@ -30,6 +32,11 @@ const elements = {
   yearSelect: document.getElementById("year-select"),
   kpiGrid: document.getElementById("kpi-grid"),
   chartsGrid: document.getElementById("charts-grid"),
+  chatInput: document.getElementById("chat-input"),
+  chatResponse: document.getElementById("chat-response"),
+  chatSubmit: document.getElementById("chat-submit"),
+  chatPanel: document.getElementById("chat-panel"),
+  dashboardShell: document.querySelector(".dashboard-shell"),
   scopeTabs: [...document.querySelectorAll("[data-scope]")]
 };
 
@@ -172,8 +179,57 @@ elements.yearSelect.addEventListener("change", async event => {
 elements.scopeTabs.forEach(tab => {
   tab.addEventListener("click", async () => {
     setActiveScope(tab.dataset.scope);
+    if (tab.dataset.scope === "chat") {
+      elements.dashboardShell.classList.add("hidden");
+      elements.chatPanel.classList.remove("hidden");
+      setStatus("Chat IA activo. Escribe a túa pregunta e pulsa Enviar.");
+      return;
+    }
+
+    elements.dashboardShell.classList.remove("hidden");
+    elements.chatPanel.classList.add("hidden");
     await renderDashboard();
   });
+});
+
+async function sendChatMessage() {
+  const message = elements.chatInput.value.trim();
+  if (!message) {
+    elements.chatResponse.textContent = "Escribe unha pregunta antes de enviar.";
+    return;
+  }
+
+  elements.chatSubmit.disabled = true;
+  elements.chatResponse.textContent = "Enviando a túa pregunta...";
+
+  try {
+    const response = await fetch(CHAT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message })
+    });
+
+    const payload = await response.json();
+    if (!response.ok) {
+      throw new Error(payload.error || "O servidor devolveu un erro inesperado.");
+    }
+
+    elements.chatResponse.textContent = payload.answer || "O servidor non devolveu ningunha resposta.";
+  } catch (error) {
+    elements.chatResponse.textContent = `Erro no chat: ${error.message}`;
+  } finally {
+    elements.chatSubmit.disabled = false;
+  }
+}
+
+elements.chatSubmit.addEventListener("click", sendChatMessage);
+elements.chatInput.addEventListener("keydown", event => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    sendChatMessage();
+  }
 });
 
 connectAndBootstrap();

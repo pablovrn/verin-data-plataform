@@ -32,6 +32,7 @@ Actualmente la plataforma dispone de información sobre:
 │   ├── js/
 │   └── index.html
 ├── etl/                   # ETL
+├── ia/                    # API Asistente de IA
 ├── procesos/              # Procesos de ejecución
 ├── sql/                   # Esquema y consultas SQL
 │   └── datamarts/
@@ -106,6 +107,60 @@ Si quieres previsualizar el sitio en local, puedes servir `docs/` con cualquier 
 
 `python3 -m http.server 8000 --directory docs`
 
+## Asistente de IA
+
+El proyecto incluye un asistente conversacional basado en inteligencia artificial, diseñado para permitir consultas en lenguaje natural sobre los datos almacenados en la plataforma.
+
+El asistente utiliza un enfoque de **Text-to-SQL**, mediante el cual transforma la pregunta del usuario en una consulta SQL, valida dicha consulta, la ejecuta sobre PostgreSQL y posteriormente genera una respuesta en lenguaje natural a partir de los resultados obtenidos.
+
+### Arquitectura
+
+El flujo de una consulta es el siguiente:
+
+```text
+Pregunta del usuario
+        │
+        ▼
+   Modelo de IA
+        │
+        ▼
+    Generación SQL
+        │
+        ▼
+   Validación SQL
+        │
+        ▼
+     PostgreSQL
+        │
+        ▼
+      Resultados
+        │
+        ▼
+   Modelo de IA
+        │
+        ▼
+ Respuesta en lenguaje natural
+ ```
+
+ La IA se ejecuta actualmente de forma local mediante Ollama, utilizando un modelo de lenguaje local.
+
+ ### Estado actual
+ El asistente se encuentra actualmente en fase experimental y de desarrollo.
+
+Aunque el sistema ya es capaz de realizar consultas y generar respuestas correctamente en determinados casos, todavía presenta limitaciones en la interpretación de preguntas más complejas y en la generación de consultas para determinados escenarios.
+
+Por este motivo, la funcionalidad de chat de IA se encuentra temporalmente desactivada en el dashboard web público.
+
+La API y el asistente pueden ejecutarse y probarse de forma local durante el desarrollo.
+
+Para ejecutar la API en local se utiliza el comando:
+
+```bash
+./procesos/run_api.sh
+```
+
+Para interactuar con ella se puede o bien acceder a http://localhost:8000/docs o bien descomentar el botón en index.html y levantar la web.
+
 
 ## Tecnologías
 
@@ -114,3 +169,5 @@ Si quieres previsualizar el sitio en local, puedes servir `docs/` con cualquier 
 - PostgreSQL
 - SQL
 - Git
+- Ollama
+- FastAPI

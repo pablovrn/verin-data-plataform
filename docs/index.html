@@ -24,6 +24,7 @@
     <button class="scope-tab active" type="button" data-scope="population">Poboacion</button>
     <button class="scope-tab" type="button" data-scope="economy">Economia</button>
     <button class="scope-tab" type="button" data-scope="services">Servicios</button>
+    <!-- <button class="scope-tab" type="button" data-scope="chat">Chat IA</button> -->
   </nav>
 
   <section class="dashboard-shell">
@@ -53,6 +54,23 @@
 
     <section class="kpi-grid" id="kpi-grid"></section>
     <section class="charts-grid" id="charts-grid"></section>
+  </section>
+
+  <section class="panel chat-panel hidden" id="chat-panel">
+    <div class="section-heading">
+      <div>
+        <h2>Chat IA</h2>
+        <p>Escribe una pregunta y recibe una respuesta desde el servidor local.</p>
+      </div>
+    </div>
+    <div class="chat-body">
+      <div class="chat-response" id="chat-response">Escribe tu pregunta e pulsa Enviar para recibir respuesta.</div>
+      <div class="chat-controls">
+        <label class="sr-only" for="chat-input">Mensaje de chat</label>
+        <textarea id="chat-input" placeholder="¿Qué quieres saber?" rows="4"></textarea>
+        <button id="chat-submit" type="button">Enviar</button>
+      </div>
+    </div>
   </section>
 </div>
 

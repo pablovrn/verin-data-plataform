@@ -2,4 +2,7 @@ pandas
 sqlalchemy       
 python-dotenv    
 psycopg2-binary
-requests         
+requests
+fastapi
+uvicorn
+openai         
